@@ -243,8 +243,7 @@ var width = $("#map").width(),
 
 	});
 
-	//d3.csv("https://raw.githubusercontent.com/NYCDOB/ActiveAHVs/gh-pages/data/activeAHVs.csv",function(data){
-	d3.csv("data/ActiveVacates.csv",function(data){
+	d3.csv("https://raw.githubusercontent.com/NYCDOB/ActiveVacates/gh-pages/data/activeVacates.csv",function(data){
 				points = data.map(function(d){
 				d.latLng = [+d.Latitude,+d.Longitude];
 				d.bin = d["BIN Number"];				
@@ -338,8 +337,7 @@ var width = $("#map").width(),
 		var table = $('#riskTable').DataTable({
 
 				"ajax": {
-					//"url": "https://raw.githubusercontent.com/NYCDOB/ActiveAHVs/gh-pages/data/activeAHVsJson.json",
-					"url": "data/activeVacates.json",
+					"url": "https://raw.githubusercontent.com/NYCDOB/ActiveVacates/gh-pages/data/activeVacates.json",
 					"dataSrc": ""
 				},
 
