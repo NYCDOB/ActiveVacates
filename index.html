@@ -175,7 +175,7 @@ $(document).ready(function(){
 	var latlong = [];
 	var selection = [];
 	var formatDate = d3.time.format("%-m/%-d/%Y").parse;
-var map = L.map('map').setView([40.72215448921957, -73.98616799064006], 14);
+var map = L.map('map').setView([40.713312, -73.977407], 11);
 
 L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 var tooltip = d3.select('body').append('div')
