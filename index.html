@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ACTIVE COMMERCIAL CONSTRUCTION SITES</title>
+  <title>ACTIVE VACATES</title>
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
   <link href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css' rel='stylesheet' type='text/css'/>
@@ -59,21 +59,6 @@ div.tooltip {
 	visibility: hidden;
 }
 
-<!-- #map-container{ -->
-	<!-- height: 890px; -->
-	<!-- width: 1410px; -->
-	<!-- border: 2px solid #3d4a57; -->
-	<!-- position: relative; -->
-	<!-- display: block; -->
-<!-- } -->
-<!-- #map { -->
-	<!-- position: absolute; -->
-	<!-- height: 100%; -->
-	<!-- width: 100%; -->
-	<!-- background-color: #333; -->
-	<!-- pointer-events: all; -->
-	<!-- display: block; -->
-<!-- } -->
 #map {
 	height: 100%;
 	width: 100%;
@@ -127,17 +112,17 @@ tr.shown td.details-control {
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 	<a class="logo" href="https://www1.nyc.gov/site/buildings/index.page" target="_blank"> </a>
 	  <div class="heading">
-			ACTIVE COMMERCIAL CONSTRUCTION SITES		
+			ACTIVE VACATES - PAST 3 YEARS		
 	  </div>
 	</div>
 	<div class="row">
-		  <div class="col-md-9" style="height:89vh">
+		  <div class="col-lg-9" style="height:89vh">
 			  <div class="chart-stage" id="map-container" style="border:1px solid black;height:100%;width:100%">
 				<div id="map"></div>
 			  </div>
 		  </div>
 
-			  <div class="col-md-3" style="height:89vh">
+			  <div class="col-lg-3" style="height:89vh">
 				<div class="chart-wrapper" id="table-container">
 				  <div class="chart-stage" id="chart-01">
 					<table id="riskTable" class="display" style="width:100%">
@@ -160,7 +145,6 @@ tr.shown td.details-control {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.9/d3.min.js"></script>
 <script src="Leaflet.D3SvgOverlay-master/L.D3SvgOverlay.min.js"></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/v/dt/dt-1.10.12/r-2.1.0/se-1.2.0/datatables.min.js"></script>
 
@@ -208,14 +192,17 @@ var width = $("#map").width(),
 			if(d3.select(this).style("fill-opacity") != 0){
 				tooltip.style("visibility", "visible");
 				tooltip.html(
-					'JOB NUMBER: ' + d["Job Number"] + '</br>' +
-					'JOB TYPE: ' + d["Job Type"] + '</br>' +
+					'COMPLAINT NUMBER: ' + d["Complaint Number"] + '</br>' +
 					'BIN: ' + d["BIN Number"] + '</br>' +								
 					'ADDRESS: '+ [d.Address] + ', ' + [d.Borough.toUpperCase()] + '</br>' +
 					'COMMUNITY DISTRICT: ' + d["Community Board"] + '</br>' +
-					'PERMIT ISSUANCE DATE: ' + d["Permit Issuance Date"] + '</br>' +
-					'PERMIT EXPIRATION DATE: ' + d["Permit Expiration Date"] + '</br>' +
-					'PROPOSED OCCUPANCY CLASSIFICATION: ' + d["Proposed Occupancy Classification Description"]
+					'PRIORITY CODE: '+ d["Priority Code"] + '</br>' +
+					'COMPLAINT CATEGORY: '+ d["Complaint  Category Description"] + '</br>' +
+					'COMPLAINT DISPOSITION: ' + d["Complaint Disposition Description"] + '</br>' +
+					'INSPECTION DATE: ' + d["Inspection Date"] + '</br>' +
+					'LAST DISPOSITION DATE: ' + d["Last Disposition Date"] + '</br>' +
+					'LAST DISPOSITION CODE: ' + d["Last Disposition Code Description"] + '</br>' +
+					'DAYS SINCE VACATE SERVED: ' + d["Days Since Vacate Served"]
 				)
 				if (d3.event.pageX > (width - 200)) {
 				   tooltip.style("left", (d3.event.pageX - 350) + "px");
@@ -246,17 +233,22 @@ var width = $("#map").width(),
 
 	});
 
-	d3.csv("https://raw.githubusercontent.com/NYCDOB/ActiveVacates/gh-pages/data/ActiveVacates.csv",function(data){
-
+	//d3.csv("https://raw.githubusercontent.com/NYCDOB/ActiveAHVs/gh-pages/data/activeAHVs.csv",function(data){
+	d3.csv("data/ActiveVacates.csv",function(data){
 				points = data.map(function(d){
 				d.latLng = [+d.Latitude,+d.Longitude];
 				d.bin = d["BIN Number"];				
 				d.address = [d.Address];
 				d.CD = d["Community Board"];
 				d.Borough = d["Borough Name"].toUpperCase();
-				d.permitIssuanceDate = formatDate(d["Permit Issuance Date"]);
-				d.permitExpDate = formatDate(d["Permit Expiration Date"]);
-				d.propOccClass = d["Proposed Occupancy Classification Description"];
+				d.complaintNum = d["Complaint Number"];
+				d.priorityCode = d["Priority Code"];
+				d.complaintCatDesc = d["Complaint  Category Description"];
+				d.complaintDisp = d["Complaint Disposition"];
+				d.inspDate = formatDate(d["Inspection Date"]);
+				d.dispDate = formatDate(d["Last Disposition Date"]);
+				d.dispCode = d["Last Disposition Code Description"];
+				d.daysVacateServed = d["Days Since Vacate Served"];
 			return d;
 			});
 		pointsOverlay.addTo(map);
@@ -286,12 +278,8 @@ var width = $("#map").width(),
 	function format ( d ) {
 		return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
 			'<tr>'+
-				'<td>Job Number:</td>'+
-				'<td>'+d["Job Number"]+'</td>'+
-			'</tr>'+
-			'<tr>'+
-				'<td>Job Type:</td>'+
-				'<td>'+d["Job Type"]+'</td>'+
+				'<td>Complaint Number:</td>'+
+				'<td>'+d["Complaint Number"]+'</td>'+
 			'</tr>'+
 			'<tr>'+
 				'<td>BIN:</td>'+
@@ -302,16 +290,32 @@ var width = $("#map").width(),
 				'<td>'+d["Community Board"]+'</td>'+
 			'</tr>'+
 			'<tr>'+
-				'<td>Permit Issuance Date:</td>'+
-				'<td>'+d["Permit Issuance Date"]+'</td>'+
+				'<td>Priority Code:</td>'+
+				'<td>'+d["Priority Code"]+'</td>'+
 			'</tr>'+
 			'<tr>'+
-				'<td>Permit Expiration Date:</td>'+
-				'<td>'+d["Permit Expiration Date"]+'</td>'+
+				'<td>Complaint Category:</td>'+
+				'<td>'+d["Complaint  Category Description"]+'</td>'+
 			'</tr>'+
 			'<tr>'+
-				'<td>Proposed Occupancy Classification:</td>'+
-				'<td>'+d["Proposed Occupancy Classification Description"]+'</td>'+
+				'<td>Complaint Disposition:</td>'+
+				'<td>'+d["Complaint Disposition Description"]+'</td>'+
+			'</tr>'+
+			'<tr>'+
+				'<td>Inspection Date:</td>'+
+				'<td>'+d["Inspection Date"]+'</td>'+
+			'</tr>'+
+			'<tr>'+
+				'<td>Last Disposition Date:</td>'+
+				'<td>'+d["Last Disposition Date"]+'</td>'+
+			'</tr>'+
+			'<tr>'+
+				'<td>Last Disposition Code:</td>'+
+				'<td>'+d["Last Disposition Code Description"]+'</td>'+
+			'</tr>'+
+			'<tr>'+
+				'<td>Days Since Vacate Served:</td>'+
+				'<td>'+d["Days Since Vacate Served"]+'</td>'+
 			'</tr>'+
 			
 		'</table>';
@@ -324,7 +328,8 @@ var width = $("#map").width(),
 		var table = $('#riskTable').DataTable({
 
 				"ajax": {
-					"url": "https://raw.githubusercontent.com/NYCDOB/ActiveVacates/gh-pages/data/ActiveVacates.json",
+					//"url": "https://raw.githubusercontent.com/NYCDOB/ActiveAHVs/gh-pages/data/activeAHVsJson.json",
+					"url": "data/ActiveVacates.json",
 					"dataSrc": ""
 				},
 
